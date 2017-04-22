@@ -1,5 +1,8 @@
 package com.github.t9t.minecraftrconclient;
 
+/**
+ * Generic exception thrown by {@link RconClientException} when any exception occurs.
+ */
 public class RconClientException extends RuntimeException {
     public RconClientException(String message) {
         super(message);

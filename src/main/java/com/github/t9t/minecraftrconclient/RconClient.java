@@ -11,6 +11,27 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * An RCON client to remotely control a Minecraft server. Use {@link #open(String, int, String)} to create an instance
+ * of {@link RconClient}, open a connection to a Minecraft server, and authenticate. Then use
+ * {@link #sendCommand(String)} to send a command to the server. Make sure to close the connection again using
+ * {@link #close()}.
+ * <p>
+ * The connection is only opened when the client is created. If for any reason the connection is closed
+ * or broken (eg. by the server shutting down or some network failure), no attempt is made to re-establish the
+ * connection. When {@code sendCommand} is invoked in such a case, an exception will occur.
+ * <p>
+ * To enable RCON support in your Minecraft server, add the following to your {@code server.properties} (or modify
+ * existing properties if they are already present):
+ * <pre>{@code
+ * enable-rcon=true
+ * rcon.password=<your password>
+ * rcon.port=<1-65535>
+ * }</pre>
+ *
+ * @see <a href="http://wiki.vg/RCON">Page describing the RCON protocol</a>
+ * @see <a href="http://minecraft.gamepedia.com/Server.properties">Minecraft server.properties documentation</a>
+ */
 public class RconClient implements Closeable {
     private static final int AUTHENTICATION_FAILURE_ID = -1;
     private static final Charset PAYLOAD_CHARSET = StandardCharsets.US_ASCII;
@@ -26,6 +47,19 @@ public class RconClient implements Closeable {
         this.currentRequestId = new AtomicInteger(1);
     }
 
+    /**
+     * Create an instance of {@link RconClient}, opening a connection to the specified {@code host} and {@code port},
+     * and authenticate using the specified {@code password}. If no connection can be established,
+     * {@link RconClientException} is thrown, wrapping any exception of the underlying communication channel
+     * (eg. {@link IOException}). If the {@code password} is incorrect, an {@link AuthFailureException} is thrown.
+     *
+     * @param host     The server's host name or IP address
+     * @param port     The server RCON port number ({@code rcon.port} in {@code server.properties})
+     * @param password The server's RCON password ({@code rcon.password} in {@code server.properties})
+     * @return An {@link RconClient} with an established connection
+     * @throws RconClientException  When any exception is thrown by the communication channel
+     * @throws AuthFailureException When the password is wrong
+     */
     public static RconClient open(String host, int port, String password) {
         SocketChannel socketChannel;
         try {
@@ -48,6 +82,20 @@ public class RconClient implements Closeable {
         return rconClient;
     }
 
+    /**
+     * Send {@code command} to the server, returning any data that was returned by the server. Note that in a lot of
+     * cases when the command is delivered and executed successfully, an empty response is returned by the server,
+     * resulting in an empty String as a return value of this method. When an unknown command is sent, the server will
+     * return some text along the lines of {@code "Unknown command. Try /help for a list of commands"}.
+     * <p>
+     * When any communication failure occurs (eg. broken connection, server has shut down), an
+     * {@link RconClientException} is thrown, wrapping any exception of the underlying communication channel
+     * (eg. {@link IOException}).
+     *
+     * @param command The command to send to the server
+     * @return Response as returned by the server
+     * @throws RconClientException When any exception is thrown by the communication channel
+     */
     public String sendCommand(String command) {
         return send(TYPE_COMMAND, command);
     }

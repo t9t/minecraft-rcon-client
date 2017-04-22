@@ -77,10 +77,10 @@ public class RconClientCli {
     }
 
     private static int printUsage() {
-        System.out.println("Usage: java -jar jarcon-<version>.jar <host[:port]> <password> <-t|commands>"); // TODO: usage
+        System.out.println("Usage: java -jar minecraft-rcon-client-<version>.jar <host[:port]> <password> <-t|commands>");
         System.out.println();
-        System.out.println("Example 1: java -jar jarcon-1.0.0.jar localhost:12345 hunter2 'say Hello, world' 'teleport Notch 0 0 0'");
-        System.out.println("Example 2: java -jar jarcon-1.0.0.jar localhost:12345 hunter2 -t");
+        System.out.println("Example 1: java -jar minecraft-rcon-client-1.0.0.jar localhost:12345 hunter2 'say Hello, world' 'teleport Notch 0 0 0'");
+        System.out.println("Example 2: java -jar minecraft-rcon-client-1.0.0.jar localhost:12345 hunter2 -t");
         System.out.println();
         System.out.println("The port can be omitted, the default is 25575.");
         System.out.println("\"-t\" enables terminal mode, to enter commands in an interactive terminal.");
